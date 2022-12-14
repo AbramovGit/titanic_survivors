@@ -1,4 +1,4 @@
-from sklearn import svm, ensemble
+from sklearn import ensemble
 from sklearn import preprocessing
 from sklearn.model_selection import train_test_split
 import pandas as pd
@@ -27,7 +27,6 @@ def convert_csv_to_arrays(path_to_csv: str, train: bool):
     return in_array
 
 
-# Press the green button in the gutter to run the script.
 if __name__ == '__main__':
     out_array, in_array = convert_csv_to_arrays('data/train.csv', True)
     x_train, x_test, y_train, y_test = train_test_split(in_array, out_array,
