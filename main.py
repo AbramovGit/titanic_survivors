@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import xgboost as xgb
 from sklearn.model_selection import train_test_split, ShuffleSplit, LearningCurveDisplay
-from sklearn.metrics import classification_report
+from sklearn.metrics import precision_score, recall_score, f1_score
 import joblib
 import pandas as pd
 
@@ -21,13 +21,11 @@ def convert_csv_to_arrays(path_to_csv: str, train: bool):
     label_encoder = preprocessing.LabelEncoder()
     names_encoder = preprocessing.OrdinalEncoder()
     cabin_encoder = preprocessing.LabelEncoder()
-    psclass_encoder = preprocessing.OneHotEncoder(sparse=False)
-    age_encoder = preprocessing.OneHotEncoder(sparse=False)
+    age_encoder = preprocessing.StandardScaler()
 
     original_df['Embarked'] = label_encoder.fit_transform(original_df['Embarked'])
     original_df['Name'] = names_encoder.fit_transform(original_df['Name'].values.reshape(-1, 1))
     original_df['Cabin'] = cabin_encoder.fit_transform(original_df['Cabin'].values.reshape(-1, 1))
-    original_df['Pclass'] = psclass_encoder.fit_transform(original_df['Cabin'].values.reshape(-1, 1))
     original_df['Age'] = age_encoder.fit_transform(original_df['Cabin'].values.reshape(-1, 1))
 
     corr = original_df.corr().round(2)
@@ -70,8 +68,14 @@ if __name__ == '__main__':
     rf_clf = model_selection.GridSearchCV(ensemble.RandomForestClassifier(), scoring='roc_auc', param_grid=param_grid)
     gb_clf.fit(x_train, y_train)
     rf_clf.fit(x_train, y_train)
-    print(f'Classification report of gb is:\n{classification_report(y_test, gb_clf.predict(x_test))}')
-    print(f'Classification report of rf is:\n{classification_report(y_test, rf_clf.predict(x_test))}')
+
+    print(f'Precision report of GB is:      {100 * precision_score(y_test, gb_clf.predict(x_test)):.2f}%')
+    print(f'Recall report of GB is:         {100 * recall_score(y_test, gb_clf.predict(x_test)):.2f}%')
+    print(f'F1 report of GB is:             {100 * f1_score(y_test, gb_clf.predict(x_test)):.2f}%')
+
+    print(f'Precision report of RF is:      {100 * precision_score(y_test, rf_clf.predict(x_test)):.2f}%')
+    print(f'Recall report of RF is:         {100 * recall_score(y_test, rf_clf.predict(x_test)):.2f}%')
+    print(f'F1 report of rf RF:             {100 * f1_score(y_test, rf_clf.predict(x_test)):.2f}%')
 
     fig, ax = plt.subplots(nrows=1, ncols=2, figsize=(10, 6))
     common_params = {
